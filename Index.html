@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical CV Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
+    <style>
+        :root {
+            --primary-color: #2a9d8f;
+            --secondary-color: #264653;
+            --accent-color: #e9c46a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f8f9fa;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .cv-preview {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            box-shadow: 0 0 15px rgba(0,0,0,0.08);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .suggestions {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #fff3cd;
+            border-radius: 8px;
+            color: #856404;
+        }
+
+        .edit-mode {
+            display: none;
+        }
+
+        .cv-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        .form-subsection {
+    grid-column: 1 / -1;
+    border: 1px solid #eee;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+}
+
+.form-subsection h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.add-button {
+    background: var(--accent-color);
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.input-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.education-entry,
+.experience-entry,
+.certification-entry,
+.reference-entry {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+/* Add to CSS */
+.cv-item {
+    margin-bottom: 1rem;
+    page-break-inside: avoid;
+}
+
+.cv-item h5 {
+    color: var(--secondary-color);
+    margin-bottom: 0.3rem;
+    font-size: 1.1rem;
+}
+
+#cvPreview ul {
+    padding-left: 1.5rem;
+    list-style-type: square;
+}
+
+#cvPreview p {
+    margin: 0.3rem 0;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Medical Professional CV Generator</h1>
+        
+        <!-- Input Form -->
+        <div id="inputForm">
+            <div class="form-section">
+                <div class="input-group">
+                    <label for="specialty">Medical Specialty</label>
+                    <!-- In the HTML section, update the select options: -->
+<select id="specialty" required>
+    <option value="">Select Specialty</option>
+    <option value="allergist">Allergist/Immunologist</option>
+    <option value="anesthesiologist">Anesthesiologist</option>
+    <option value="cardiologist">Cardiologist</option>
+    <option value="dermatologist">Dermatologist</option>
+    <option value="emergency">Emergency Medicine Physician</option>
+    <option value="endocrinologist">Endocrinologist</option>
+    <option value="family">Family Medicine Physician</option>
+    <option value="gastroenterologist">Gastroenterologist</option>
+    <option value="geriatric">Geriatric Medicine Specialist</option>
+    <option value="hematologist">Hematologist</option>
+    <option value="internist">Internist</option>
+    <option value="nephrologist">Nephrologist</option>
+    <option value="neurologist">Neurologist</option>
+    <option value="obgyn">OB/GYN</option>
+    <option value="oncologist">Oncologist</option>
+    <option value="ophthalmologist">Ophthalmologist</option>
+    <option value="orthopedist">Orthopedist</option>
+    <option value="ent">Otolaryngologist (ENT)</option>
+    <option value="pathologist">Pathologist</option>
+    <option value="pediatrician">Pediatrician</option>
+    <option value="physiatrist">Physiatrist</option>
+    <option value="plastic">Plastic Surgeon</option>
+    <option value="pulmonologist">Pulmonologist</option>
+    <option value="psychiatrist">Psychiatrist</option>
+    <option value="radiologist">Radiologist</option>
+    <option value="rheumatologist">Rheumatologist</option>
+    <option value="surgeon">Surgeon (General)</option>
+    <option value="thoracic">Thoracic Surgeon</option>
+    <option value="urologist">Urologist</option>
+    <option value="vascular">Vascular Surgeon</option>
+    <option value="criticalcare">Critical Care Medicine</option>
+    <option value="infectious">Infectious Disease Specialist</option>
+    <option value="neonatologist">Neonatologist</option>
+    <option value="nuclear">Nuclear Medicine Specialist</option>
+    <option value="pain">Pain Management Specialist</option>
+    <option value="preventive">Preventive Medicine</option>
+    <option value="sports">Sports Medicine Specialist</option>
+    <option value="hospitalist">Hospitalist</option>
+    <option value="intensivist">Intensivist</option>
+    <option value="nurse">Nurse Practitioner</option>
+    <option value="physicianassistant">Physician Assistant</option>
+    <option value="midwife">Certified Nurse Midwife</option>
+    <option value="anesthetist">Certified Registered Nurse Anesthetist</option>
+    <option value="dietitian">Clinical Dietitian</option>
+    <option value="pharmacist">Clinical Pharmacist</option>
+    <option value="psychologist">Clinical Psychologist</option>
+    <option value="optometrist">Optometrist</option>
+    <option value="podiatrist">Podiatrist</option>
+    <option value="chiropractor">Chiropractor</option>
+    <option value="dentist">Dentist</option>
+    <option value="veterinarian">Veterinarian</option>
+</select>
+                </div>
+                
+                <!-- Add other form fields here -->
+                <div class="input-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" required>
+                </div>
+                <!-- Add these to the HTML form section -->
+<div class="form-section">
+    <!-- Personal Information -->
+    <div class="input-group">
+        <label for="contactNumber">Contact Number</label>
+        <input type="tel" id="contactNumber" required>
+    </div>
+    
+    <div class="input-group">
+        <label for="email">Professional Email</label>
+        <input type="email" id="email" required>
+    </div>
+
+    <!-- Medical License -->
+    <div class="input-group">
+        <label for="medicalLicense">Medical License Number</label>
+        <input type="text" id="medicalLicense">
+    </div>
+    
+    <div class="input-group">
+        <label for="licenseState">License State/Country</label>
+        <input type="text" id="licenseState">
+    </div>
+
+    <!-- Education Section -->
+    <div class="form-subsection">
+        <h3>Education</h3>
+        <div class="education-entry">
+            <div class="input-group">
+                <label for="institution">Institution Name</label>
+                <input type="text" id="institution" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="degree">Degree Type</label>
+                <select id="degree">
+                    <option value="MD">Doctor of Medicine (MD)</option>
+                    <option value="DO">Doctor of Osteopathy (DO)</option>
+                    <option value="PhD">PhD</option>
+                    <option value="MSc">Master of Science</option>
+                    <option value="BSc">Bachelor of Science</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="fieldOfStudy">Field of Study</label>
+                <input type="text" id="fieldOfStudy">
+            </div>
+            
+            <div class="input-group">
+                <label for="educationDates">Dates Attended</label>
+                <input type="text" id="educationDates" placeholder="MM/YYYY - MM/YYYY">
+            </div>
+        </div>
+        <button type="button" class="add-button" onclick="addEducation()">+ Add Another Education</button>
+    </div>
+
+    <!-- Work Experience -->
+    <div class="form-subsection">
+        <h3>Work Experience</h3>
+        <div class="experience-entry">
+            <div class="input-group">
+                <label for="jobTitle">Job Title</label>
+                <input type="text" id="jobTitle">
+            </div>
+            
+            <div class="input-group">
+                <label for="employer">Employer/Hospital</label>
+                <input type="text" id="employer">
+            </div>
+            
+            <div class="input-group">
+                <label for="employmentDates">Employment Dates</label>
+                <input type="text" id="employmentDates" placeholder="MM/YYYY - MM/YYYY">
+            </div>
+            
+            <div class="input-group">
+                <label for="responsibilities">Key Responsibilities</label>
+                <textarea id="responsibilities" rows="4"></textarea>
+            </div>
+        </div>
+        <button type="button" class="add-button" onclick="addExperience()">+ Add Another Experience</button>
+    </div>
+
+    <!-- Certifications -->
+    <div class="form-subsection">
+        <h3>Certifications</h3>
+        <div class="certification-entry">
+            <div class="input-group">
+                <label for="certificationName">Certification Name</label>
+                <input type="text" id="certificationName">
+            </div>
+            
+            <div class="input-group">
+                <label for="certifyingBody">Certifying Body</label>
+                <input type="text" id="certifyingBody">
+            </div>
+            
+            <div class="input-group">
+                <label for="certificationDate">Date Obtained</label>
+                <input type="month" id="certificationDate">
+            </div>
+        </div>
+        <button type="button" class="add-button" onclick="addCertification()">+ Add Another Certification</button>
+    </div>
+
+    <!-- Skills -->
+    <div class="form-subsection">
+        <h3>Professional Skills</h3>
+        <div class="input-group">
+            <label for="skills">Technical Skills</label>
+            <textarea id="skills" 
+                placeholder="List skills separated by commas (e.g., Patient Care, EHR Systems, Surgical Procedures)"
+                rows="3"></textarea>
+        </div>
+    </div>
+
+    <!-- Professional Affiliations -->
+    <div class="form-subsection">
+        <h3>Professional Affiliations</h3>
+        <div class="input-group">
+            <label for="organizations">Memberships</label>
+            <input type="text" id="organizations" 
+                placeholder="e.g., AMA, ANA, Specialty Associations">
+        </div>
+    </div>
+
+    <!-- Publications/Research -->
+    <div class="form-subsection">
+        <h3>Publications & Research</h3>
+        <div class="input-group">
+            <label for="publications">Notable Publications</label>
+            <textarea id="publications" rows="3"></textarea>
+        </div>
+    </div>
+
+    <!-- References -->
+    <div class="form-subsection">
+        <h3>Professional References</h3>
+        <div class="reference-entry">
+            <div class="input-group">
+                <label for="referenceName">Reference Name</label>
+                <input type="text" id="referenceName">
+            </div>
+            
+            <div class="input-group">
+                <label for="referenceTitle">Title/Position</label>
+                <input type="text" id="referenceTitle">
+            </div>
+            
+            <div class="input-group">
+                <label for="referenceContact">Contact Information</label>
+                <input type="text" id="referenceContact">
+            </div>
+        </div>
+        <button type="button" class="add-button" onclick="addReference()">+ Add Another Reference</button>
+    </div>
+</div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="generateCV()">Generate CV</button>
+            </div>
+        </div>
+
+        <!-- CV Preview -->
+        <div id="cvPreview" class="cv-preview" style="display: none;">
+            <div class="cv-header">
+                <h2 id="cvName"></h2>
+                <h3 id="cvSpecialty"></h3>
+            </div>
+            
+            <!-- CV Content Sections -->
+<div class="cv-section">
+        <h4>Contact Information</h4>
+        <div id="cvContact"></div>
+    </div>
+    
+    <div class="cv-section">
+        <h4>Education</h4>
+        <div id="cvEducation"></div>
+    </div>
+    
+    <div class="cv-section">
+        <h4>Experience</h4>
+        <div id="cvExperience"></div>
+    </div>
+    
+    <!-- Add these new sections -->
+    <div class="cv-section">
+        <h4>Certifications</h4>
+        <div id="cvCertifications"></div>
+    </div>
+    
+    <div class="cv-section">
+        <h4>Skills</h4>
+        <div id="cvSkills"></div>
+    </div>
+    
+    <div class="cv-section">
+        <h4>Professional Affiliations</h4>
+        <div id="cvOrganizations"></div>
+    </div>
+    
+    <div class="cv-section">
+        <h4>Publications</h4>
+        <div id="cvPublications"></div>
+    </div>
+    
+    <div class="cv-section">
+        <h4>References</h4>
+        <div id="cvReferences"></div>
+    </div>
+</div>
+            <div class="button-group">
+                <button onclick="exportPDF()">Download PDF</button>
+                <button onclick="exportDOC()">Download DOC</button>
+                <button onclick="toggleEdit()">Edit CV</button>
+            </div>
+            
+            <div id="suggestions" class="suggestions"></div>
+        </div>
+    </div>
+
+    <script>
+        const atsKeywords = {
+            nurse: ['ACLS Certified', 'Patient Care', 'Diagnosis', 'Treatment Plans', 'BLS Certified'],
+            surgeon: ['Surgical Procedures', 'Operative Reports', 'Patient Safety', 'Board Certified', 'Minimally Invasive'],
+            radiologist: ['Diagnostic Imaging', 'MRI Interpretation', 'Radiation Safety', 'CT Scan', 'Ultrasound'],
+            allergist: ['Immunotherapy', 'Allergy Testing', 'Asthma Management', 'Patch Testing', 'Immunodeficiency'],
+    cardiologist: ['Echocardiography', 'Cardiac Catheterization', 'ECG Interpretation', 'Hypertension Management', 'Heart Failure'],
+    dermatologist: ['Mohs Surgery', 'Cosmetic Dermatology', 'Skin Biopsy', 'Laser Therapy', 'Psoriasis Treatment'],
+    emergency: ['ACLS Certified', 'Trauma Care', 'Emergency Procedures', 'Triage Management', 'PALS Certified'],
+    neurologist: ['EEG Interpretation', 'Stroke Management', 'Epilepsy Treatment', 'Neuroimaging Analysis', 'Botulinum Toxin Therapy'],
+    oncologist: ['Chemotherapy Protocols', 'Clinical Trials', 'Palliative Care', 'Tumor Board Participation', 'Hematology'],
+    pediatrician: ['Well-Child Visits', 'Vaccination Schedules', 'Developmental Screening', 'Adolescent Medicine', 'Breastfeeding Support'],
+    psychiatrist: ['Psychopharmacology', 'Cognitive Behavioral Therapy', 'Crisis Intervention', 'DSM-5 Diagnosis', 'Telepsychiatry'],
+    surgeon: ['Minimally Invasive Surgery', 'Surgical Safety Checklists', 'Da Vinci Robotics', 'Wound Management', 'Surgical Outcomes'],
+    radiologist: ['CT Guided Biopsy', 'Mammography Interpretation', 'Interventional Radiology', 'Radiation Dose Optimization', 'PACS Systems'],
+    pulmonologist: ['Bronchoscopy', 'PFT Interpretation', 'Ventilator Management', 'COPD Management', 'Sleep Medicine'],
+    gastroenterologist: ['Endoscopy', 'Colonoscopy', 'IBD Management', 'Liver Biopsy', 'ERCP'],
+    orthopedist: ['Arthroscopy', 'Fracture Repair', 'Joint Replacement', 'Sports Injuries', 'Casting Techniques'],
+    obgyn: ['Obstetric Ultrasound', 'High-Risk Pregnancy', 'Minimally Invasive Gynecology', 'Fetal Monitoring', 'Colposcopy'],
+    physiatrist: ['EMG/NCS', 'Prosthetics/Orthotics', 'Pain Management', 'Rehabilitation Protocols', 'Spinal Cord Injury'],
+    // Add to atsKeywords object
+anesthetist: [
+    'Airway Management',
+    'Regional Anesthesia',
+    'Pain Management',
+    'ACLS Certification',
+    'Pediatric Anesthesia',
+    'Obstetric Anesthesia',
+    'Hemodynamic Monitoring',
+    'ASA Physical Status',
+    'Anesthesia Protocols',
+    'CRNA Certification'
+],
+    _general: [
+        'Patient-Centered Care',
+        'Electronic Health Records',
+        'Quality Improvement',
+        'Multidisciplinary Collaboration',
+        'Evidence-Based Practice',
+        'HIPAA Compliance',
+        'Telemedicine',
+        'Clinical Documentation',
+        'Continuing Medical Education',
+        'Medical Research'
+    ]
+        };
+function addEducation() {
+    const clone = document.querySelector('.education-entry').cloneNode(true);
+    clone.querySelectorAll('input').forEach(input => input.value = '');
+    document.querySelector('.form-subsection h3').before(clone);
+}
+
+function addExperience() {
+    const clone = document.querySelector('.experience-entry').cloneNode(true);
+    clone.querySelectorAll('input, textarea').forEach(field => field.value = '');
+    document.querySelector('.experience-entry').parentNode.insertBefore(clone, document.querySelector('.add-button'));
+}
+
+function addCertification() {
+    const clone = document.querySelector('.certification-entry').cloneNode(true);
+    clone.querySelectorAll('input').forEach(input => input.value = '');
+    document.querySelector('.certification-entry').parentNode.insertBefore(clone, document.querySelector('.add-button'));
+}
+
+function addReference() {
+    const clone = document.querySelector('.reference-entry').cloneNode(true);
+    clone.querySelectorAll('input').forEach(input => input.value = '');
+    document.querySelector('.reference-entry').parentNode.insertBefore(clone, document.querySelector('.add-button'));
+}
+        function generateCV() {
+    const cvData = {
+        specialty: document.getElementById('specialty').value,
+        name: document.getElementById('fullName').value,
+        contact: document.getElementById('contactNumber').value,
+        email: document.getElementById('email').value,
+        license: {
+            number: document.getElementById('medicalLicense').value,
+            state: document.getElementById('licenseState').value
+        },
+        education: Array.from(document.querySelectorAll('.education-entry')).map(edu => ({
+            institution: edu.querySelector('#institution').value,
+            degree: edu.querySelector('#degree').value,
+            field: edu.querySelector('#fieldOfStudy').value,
+            dates: edu.querySelector('#educationDates').value
+        })),
+        experience: Array.from(document.querySelectorAll('.experience-entry')).map(exp => ({
+            title: exp.querySelector('#jobTitle').value,
+            employer: exp.querySelector('#employer').value,
+            dates: exp.querySelector('#employmentDates').value,
+            responsibilities: exp.querySelector('#responsibilities').value
+        })),
+        certifications: Array.from(document.querySelectorAll('.certification-entry')).map(cert => ({
+            name: cert.querySelector('#certificationName').value,
+            body: cert.querySelector('#certifyingBody').value,
+            date: cert.querySelector('#certificationDate').value
+        })),
+        skills: document.getElementById('skills').value.split(',').map(s => s.trim()),
+        organizations: document.getElementById('organizations').value,
+        publications: document.getElementById('publications').value,
+        references: Array.from(document.querySelectorAll('.reference-entry')).map(ref => ({
+            name: ref.querySelector('#referenceName').value,
+            title: ref.querySelector('#referenceTitle').value,
+            contact: ref.querySelector('#referenceContact').value
+        }))
+    };
+
+
+            // Update CV Preview
+            document.getElementById('cvName').textContent = cvData.name;
+            document.getElementById('cvSpecialty').textContent = 
+                document.getElementById('specialty').options[document.getElementById('specialty').selectedIndex].text;
+                // Update Contact Information
+    document.getElementById('cvContact').innerHTML = `
+        <p>${cvData.contact}</p>
+        <p>${cvData.email}</p>
+        <p>License: ${cvData.license.number} (${cvData.license.state})</p>
+    `;
+
+    // Update Education
+    const educationHTML = cvData.education.map(edu => `
+        <div class="cv-item">
+            <h5>${edu.institution}</h5>
+            <p>${edu.degree} in ${edu.field}</p>
+            <p>${edu.dates}</p>
+        </div>
+    `).join('');
+    document.getElementById('cvEducation').innerHTML = educationHTML;
+
+    // Update Experience
+    const experienceHTML = cvData.experience.map(exp => `
+        <div class="cv-item">
+            <h5>${exp.title} at ${exp.employer}</h5>
+            <p>${exp.dates}</p>
+            <p>${exp.responsibilities}</p>
+        </div>
+    `).join('');
+    document.getElementById('cvExperience').innerHTML = experienceHTML;
+
+    // Update Certifications
+    const certHTML = cvData.certifications.map(cert => `
+        <div class="cv-item">
+            <h5>${cert.name}</h5>
+            <p>${cert.body} - ${cert.date}</p>
+        </div>
+    `).join('');
+    document.getElementById('cvCertifications').innerHTML = certHTML;
+
+    // Update Skills
+    document.getElementById('cvSkills').innerHTML = `
+        <ul>${cvData.skills.map(skill => `<li>${skill}</li>`).join('')}</ul>
+    `;
+
+    // Update Organizations
+    document.getElementById('cvOrganizations').textContent = cvData.organizations;
+
+    // Update Publications
+    document.getElementById('cvPublications').innerHTML = cvData.publications;
+
+    // Update References
+    const refHTML = cvData.references.map(ref => `
+        <div class="cv-item">
+            <h5>${ref.name}</h5>
+            <p>${ref.title}</p>
+            <p>${ref.contact}</p>
+        </div>
+    `).join('');
+    document.getElementById('cvReferences').innerHTML = refHTML;
+            // Show CV Preview
+            document.getElementById('inputForm').style.display = 'none';
+            document.getElementById('cvPreview').style.display = 'block';
+            
+            showSuggestions();
+        }
+
+        function showSuggestions() {
+    const specialty = document.getElementById('specialty').value;
+    const existingContent = document.getElementById('cvPreview').textContent;
+    
+    const specialtyKeywords = atsKeywords[specialty] || [];
+    const generalKeywords = atsKeywords._general;
+    
+    const suggestions = [...specialtyKeywords, ...generalKeywords]
+        .filter(keyword => !existingContent.includes(keyword))
+        .slice(0, 10); // Show top 10 suggestions
+
+    const suggestionsHTML = suggestions.map(item => 
+        `<li>${item}</li>`
+    ).join('');
+    
+    document.getElementById('suggestions').innerHTML = `
+        <h4>Suggested ATS Keywords:</h4>
+        <ul>${suggestionsHTML}</ul>
+    `;
+}
+        function exportPDF() {
+            const doc = new jspdf.jsPDF();
+            const cvContent = document.getElementById('cvPreview').textContent;
+            doc.text(cvContent, 10, 10);
+            doc.save('medical-cv.pdf');
+        }
+
+        function exportDOC() {
+            const content = document.getElementById('cvPreview').innerHTML;
+            const converted = htmlDocx.asBlob(content);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(converted);
+            link.download = 'medical-cv.docx';
+            link.click();
+        }
+
+        function toggleEdit() {
+            const inputForm = document.getElementById('inputForm');
+            const cvPreview = document.getElementById('cvPreview');
+            
+            if (inputForm.style.display === 'none') {
+                inputForm.style.display = 'block';
+                cvPreview.style.display = 'none';
+            } else {
+                inputForm.style.display = 'none';
+                cvPreview.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
